@@ -75,15 +75,26 @@ pub async fn client_mode<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     let now = std::time::Instant::now();
     send_bytes(&mut substream, upload_bytes).await?;
     let elapsed = now.elapsed();
-    tracing::info!(target: LOG_TARGET, "upload time: {:?}", elapsed);
-
+    tracing::info!(
+        target: LOG_TARGET,
+        "Uploaded {} bytes in {:.4}s bandwidth {}",
+        utils::format_bytes(upload_bytes as usize),
+        elapsed.as_secs_f64(),
+        utils::format_bandwidth(elapsed, upload_bytes as usize)
+    );
     // Step 3. Send the download bytes.
     write_u64(&mut substream, download_bytes).await?;
     // Step 4. Receive the download bytes.
     let now = std::time::Instant::now();
     recv_bytes(&mut substream, download_bytes).await?;
     let elapsed = now.elapsed();
-    tracing::info!(target: LOG_TARGET, "download time: {:?}", elapsed);
+    tracing::info!(
+        target: LOG_TARGET,
+        "Downloaded {} bytes in {:.4}s bandwidth {}",
+        utils::format_bytes(download_bytes as usize),
+        elapsed.as_secs_f64(),
+        utils::format_bandwidth(elapsed, download_bytes as usize)
+    );
 
     Ok(())
 }

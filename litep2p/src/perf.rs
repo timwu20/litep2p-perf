@@ -88,7 +88,13 @@ impl Perf {
         let now = std::time::Instant::now();
         Self::send_bytes(&mut substream, upload_bytes).await?;
         let elapsed = now.elapsed();
-        tracing::info!(target: LOG_TARGET, "upload time: {:?}", elapsed);
+        tracing::info!(
+            target: LOG_TARGET,
+            "Uploaded {} bytes in {:.4}s bandwidth {}",
+            utils::format_bytes(upload_bytes as usize),
+            elapsed.as_secs_f64(),
+            utils::format_bandwidth(elapsed, upload_bytes as usize)
+        );
 
         // Step 3. Send the download bytes.
         Self::write_u64(&mut substream, download_bytes).await?;
@@ -96,7 +102,13 @@ impl Perf {
         let now = std::time::Instant::now();
         Self::recv_bytes(&mut substream, download_bytes).await?;
         let elapsed = now.elapsed();
-        tracing::info!(target: LOG_TARGET, "download time: {:?}", elapsed);
+        tracing::info!(
+            target: LOG_TARGET,
+            "Downloaded {} bytes in {:.4}s bandwidth {}",
+            utils::format_bytes(download_bytes as usize),
+            elapsed.as_secs_f64(),
+            utils::format_bandwidth(elapsed, download_bytes as usize)
+        );
 
         Ok(())
     }
