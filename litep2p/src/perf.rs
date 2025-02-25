@@ -3,9 +3,9 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use litep2p::{
     codec::ProtocolCodec,
-    protocol::{Direction, TransportEvent, TransportService, UserProtocol},
-    substream::{self, Substream},
-    PeerId, ProtocolName,
+    protocol::{TransportEvent, TransportService, UserProtocol},
+    substream::Substream,
+    ProtocolName,
 };
 
 const PROTOCOL_NAME: &str = "/litep2p-perf/1.0.0";
@@ -14,22 +14,19 @@ const LOG_TARGET: &str = "litep2p-perf";
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum PerfMode {
     Server,
-    Client,
+    Client {
+        upload_bytes: u64,
+        download_bytes: u64,
+    },
 }
 
 pub struct Perf {
     mode: PerfMode,
-    upload_bytes: u64,
-    download_bytes: u64,
 }
 
 impl Perf {
-    pub fn new(mode: PerfMode, upload_bytes: u64, download_bytes: u64) -> Self {
-        Self {
-            mode,
-            upload_bytes,
-            download_bytes,
-        }
+    pub fn new(mode: PerfMode) -> Self {
+        Self { mode }
     }
 
     async fn read_u64(substream: &mut Substream) -> litep2p::Result<u64> {
@@ -88,12 +85,18 @@ impl Perf {
         // Step 1. Send the upload bytes.
         Self::write_u64(&mut substream, upload_bytes).await?;
         // Step 2. Send the upload bytes.
+        let now = std::time::Instant::now();
         Self::send_bytes(&mut substream, upload_bytes).await?;
+        let elapsed = now.elapsed();
+        tracing::info!(target: LOG_TARGET, "upload time: {:?}", elapsed);
 
         // Step 3. Send the download bytes.
         Self::write_u64(&mut substream, download_bytes).await?;
         // Step 4. Receive the download bytes.
+        let now = std::time::Instant::now();
         Self::recv_bytes(&mut substream, download_bytes).await?;
+        let elapsed = now.elapsed();
+        tracing::info!(target: LOG_TARGET, "download time: {:?}", elapsed);
 
         Ok(())
     }
@@ -114,23 +117,30 @@ impl UserProtocol for Perf {
             tokio::select! {
                 event = service.next() => match event {
                     Some(TransportEvent::ConnectionEstablished { peer, .. }) => {
-                        if let PerfMode::Client = self.mode {
+                        if let PerfMode::Client {..} = self.mode {
                             service.open_substream(peer).unwrap();
                         }
                     }
                     Some(TransportEvent::ConnectionClosed { peer }) => {
-                        tracing::debug!(target: LOG_TARGET, "connection closed: peer={}", peer);
+                        tracing::info!(target: LOG_TARGET, ?peer, "connection closed");
                     }
                     Some(TransportEvent::SubstreamOpened {
                         substream,
-                        direction,
                         ..
-                    }) => match direction {
-                        Direction::Inbound => {
+                    }) => {
+                        match self.mode {
+                            PerfMode::Server => {
+                                if let Err(e) = Self::server_mode(substream).await {
+                                    tracing::error!(target: LOG_TARGET, "server mode error: {:?}", e);
+                                }
+                            }
+                            PerfMode::Client { upload_bytes, download_bytes } => {
+                                if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
+                                    tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
+                                }
+                            }
                         }
-                        Direction::Outbound(_substream_id) => {
-                        }
-                    },
+                    }
                     _ => {},
                 },
             }
