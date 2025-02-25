@@ -1,5 +1,7 @@
 use clap::Parser as ClapParser;
 
+mod perf;
+
 /// Command for interacting with the CLI.
 #[derive(Debug, ClapParser)]
 pub enum Command {
