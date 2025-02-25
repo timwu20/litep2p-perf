@@ -1,0 +1,9 @@
+[package]
+name = "litep2p"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.31", features = ["derive", "cargo"] }
+
+tokio = { version = "1.28", features = ["macros", "time", "rt-multi-thread"] }
