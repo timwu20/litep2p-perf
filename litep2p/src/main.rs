@@ -52,7 +52,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::Server(server_opts) => {
             let perf = Box::new(perf::Perf::new(perf::PerfMode::Server));
 
+            let mut bytes = server_opts.node_key.as_bytes().to_vec();
+            if bytes.len() > 32 {
+                bytes.truncate(32);
+            } else if bytes.len() < 32 {
+                bytes.resize(32, 0);
+            }
+
+            let secret_key = litep2p::crypto::ed25519::SecretKey::try_from_bytes(&mut bytes)?;
             let litep2p_config = litep2p::config::ConfigBuilder::new()
+                .with_keypair(secret_key.into())
                 .with_tcp(litep2p::transport::tcp::config::Config {
                     listen_addresses: vec![server_opts
                         .listen_address

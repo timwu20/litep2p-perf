@@ -29,11 +29,11 @@ The protocol identifier is `/litep2p-perf/1.0.0`, and it operates in two modes, 
 ### Server
 
 ```bash
-RUST_LOG=info cargo run -- server --listen-address "/ip6/::/tcp/33333" --node-key "0000000000000000000000000000000000000000000000000000000000000002"
+RUST_LOG=info cargo run -- server --listen-address "/ip6/::/tcp/33333" --node-key "secret"
 ```
 
 ### Client
 
 ```bash
-RUST_LOG=info cargo run -- client --server-address "/ip6/::1/tcp/33333/p2p/12D3KooWHQKHXdiUt3DsiGG6tNoJEweEQZp2eXNRwcAFQyGgDRLR" --upload-bytes 1024 --download-bytes 0
+RUST_LOG=info cargo run -- client --server-address "/ip6/::1/tcp/33333/p2p/12D3KooWBpZHDZu7YSbvPaPXKhkRNJvR7MkTJMQQAVBKx9mCqz3q" --upload-bytes 1024 --download-bytes 0
 ```
