@@ -13,3 +13,4 @@ futures = "0.3.28"
 
 litep2p = { version = "0.9.1", features = ["websocket"] }
 
+utils = { path = "../utils" }
