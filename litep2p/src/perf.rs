@@ -11,22 +11,27 @@ use litep2p::{
 const PROTOCOL_NAME: &str = "/litep2p-perf/1.0.0";
 const LOG_TARGET: &str = "litep2p-perf";
 
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum PerfMode {
+    Server,
+    Client,
+}
+
 pub struct Perf {
-    is_server: bool,
+    mode: PerfMode,
     upload_bytes: u64,
     download_bytes: u64,
 }
 
 impl Perf {
-    pub fn new(is_server: bool, upload_bytes: u64, download_bytes: u64) -> Self {
+    pub fn new(mode: PerfMode, upload_bytes: u64, download_bytes: u64) -> Self {
         Self {
-            is_server,
+            mode,
             upload_bytes,
             download_bytes,
         }
     }
 }
-
 
 #[async_trait::async_trait]
 impl UserProtocol for Perf {
@@ -43,7 +48,7 @@ impl UserProtocol for Perf {
             tokio::select! {
                 event = service.next() => match event {
                     Some(TransportEvent::ConnectionEstablished { peer, .. }) => {
-                        if !self.is_server {
+                        if let PerfMode::Client = self.mode {
                             service.open_substream(peer).unwrap();
                         }
                     }
