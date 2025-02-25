@@ -1086,19 +1086,6 @@ checksum = "4ee93343901ab17bd981295f2cf0026d4ad018c7c31ba84549a4ddbb47a45104"
 
 [[package]]
 name = "litep2p"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "clap",
- "futures",
- "litep2p 0.9.1",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "litep2p"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e5a3d13ee6af6f01bb2093aa6d5f29b79ede7de6277e5d0394e8f5d8eaa5a86"
@@ -1146,6 +1133,19 @@ dependencies = [
  "yamux",
  "yasna",
  "zeroize",
+]
+
+[[package]]
+name = "litep2p-perf"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "clap",
+ "futures",
+ "litep2p",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

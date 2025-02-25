@@ -1,5 +1,5 @@
 [package]
-name = "litep2p"
+name = "litep2p-perf"
 version = "0.1.0"
 edition = "2021"
 
