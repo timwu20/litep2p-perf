@@ -38,7 +38,6 @@ pub struct ClientOpts {
     /// The downloaded bytes.
     #[clap(long)]
     download_bytes: usize,
-
 }
 
 #[tokio::main]

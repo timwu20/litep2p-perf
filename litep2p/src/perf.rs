@@ -1,5 +1,5 @@
-
 use futures::StreamExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use litep2p::{
     codec::ProtocolCodec,
@@ -30,6 +30,17 @@ impl Perf {
             upload_bytes,
             download_bytes,
         }
+    }
+
+    async fn read_u64(substream: &mut Substream) -> litep2p::Result<u64> {
+        let mut buf = [0u8; 8];
+        substream.read_exact(&mut buf).await?;
+        Ok(u64::from_be_bytes(buf))
+    }
+
+    async fn write_u64(substream: &mut Substream, value: u64) -> litep2p::Result<()> {
+        substream.write_all(&value.to_be_bytes()).await?;
+        Ok(())
     }
 }
 
