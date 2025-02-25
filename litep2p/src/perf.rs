@@ -79,6 +79,24 @@ impl Perf {
 
         Ok(())
     }
+
+    async fn client_mode(
+        mut substream: Substream,
+        upload_bytes: u64,
+        download_bytes: u64,
+    ) -> litep2p::Result<()> {
+        // Step 1. Send the upload bytes.
+        Self::write_u64(&mut substream, upload_bytes).await?;
+        // Step 2. Send the upload bytes.
+        Self::send_bytes(&mut substream, upload_bytes).await?;
+
+        // Step 3. Send the download bytes.
+        Self::write_u64(&mut substream, download_bytes).await?;
+        // Step 4. Receive the download bytes.
+        Self::recv_bytes(&mut substream, download_bytes).await?;
+
+        Ok(())
+    }
 }
 
 #[async_trait::async_trait]
