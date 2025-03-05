@@ -18,6 +18,9 @@ pub enum PerfMode {
         upload_bytes: u64,
         download_bytes: u64,
     },
+    ClientSubstream {
+        substreams: usize,
+    },
 }
 
 pub struct Perf {
@@ -125,32 +128,71 @@ impl UserProtocol for Perf {
     }
 
     async fn run(self: Box<Self>, mut service: TransportService) -> litep2p::Result<()> {
+        let mut time_to_open = std::time::Instant::now();
+        let mut times = Vec::with_capacity(1024);
+
+        let num_substreams = match self.mode {
+            PerfMode::Server => 0,
+            PerfMode::Client { .. } => 1,
+            PerfMode::ClientSubstream { substreams, .. } => substreams,
+        };
+
         loop {
             tokio::select! {
                 event = service.next() => match event {
                     Some(TransportEvent::ConnectionEstablished { peer, .. }) => {
-                        if let PerfMode::Client {..} = self.mode {
-                            service.open_substream(peer).unwrap();
+
+                        for i in 0..num_substreams {
+                            match service.open_substream(peer) {
+                                Ok(_) => {},
+                                Err(e) => {
+                                    tracing::error!(target: LOG_TARGET, "open substream error: {:?} while opening iter={i}", e);
+                                    tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+                                }
+                            }
                         }
+                        time_to_open = std::time::Instant::now();
                     }
                     Some(TransportEvent::ConnectionClosed { peer }) => {
                         tracing::info!(target: LOG_TARGET, ?peer, "connection closed");
                     }
                     Some(TransportEvent::SubstreamOpened {
                         substream,
+                        direction,
                         ..
                     }) => {
-                        match self.mode {
-                            PerfMode::Server => {
-                                if let Err(e) = Self::server_mode(substream).await {
-                                    tracing::error!(target: LOG_TARGET, "server mode error: {:?}", e);
+                        if let PerfMode::ClientSubstream {..}  = self.mode {
+                            match direction {
+                                litep2p::protocol::Direction::Inbound => {}
+                                litep2p::protocol::Direction::Outbound(..) => {
+                                    tracing::info!("Substream opened in {:?}", time_to_open.elapsed());
+
+                                    times.push(time_to_open.elapsed());
+                                    if times.len() == num_substreams {
+                                        let total = times.iter().sum::<std::time::Duration>();
+                                        let avg = total / num_substreams as u32;
+                                        tracing::info!("Average time to open substreams n={num_substreams}, avg={:?}", avg);
+                                        times.clear();
+                                    }
                                 }
                             }
-                            PerfMode::Client { upload_bytes, download_bytes } => {
-                                if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
-                                    tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
+                        } else {
+                            let mode = self.mode.clone();
+                            tokio::spawn(async move {
+                                match mode {
+                                    PerfMode::Server => {
+                                        if let Err(e) = Self::server_mode(substream).await {
+                                            tracing::error!(target: LOG_TARGET, "server mode error: {:?}", e);
+                                        }
+                                    }
+                                    PerfMode::Client { upload_bytes, download_bytes } => {
+                                        if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
+                                            tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
+                                        }
+                                    }
+                                    _ => {},
                                 }
-                            }
+                            });
                         }
                     }
                     _ => {},
