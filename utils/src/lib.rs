@@ -9,6 +9,9 @@ pub enum Command {
 
     /// Start the performance in client mode.
     Client(ClientOpts),
+
+    /// Start the performance in client mode.
+    ClientSubstream(ClientSubstreamOpts),
 }
 
 /// The server options.
@@ -37,6 +40,18 @@ pub struct ClientOpts {
     /// The downloaded bytes.
     #[clap(long)]
     pub download_bytes: usize,
+}
+
+/// The client options.
+#[derive(Debug, ClapParser)]
+pub struct ClientSubstreamOpts {
+    /// The address on which the server listens on.
+    #[clap(long)]
+    pub server_address: String,
+
+    /// The number of substreams to open.
+    #[clap(long)]
+    pub substreams: usize,
 }
 
 const KILO: f64 = 1024.0;
