@@ -88,5 +88,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 tracing::info!("Even: {:?}", event);
             }
         }
+        _ => panic!("Command unimplemented"),
     };
 }
