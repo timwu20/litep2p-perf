@@ -3,6 +3,16 @@
 The Litep2p Performance Protocol measures upload and download times between multiple Litep2p instances.
 The `/noise` and `/yamux` protocols are negotiated automatically.
 
+## Performance Measurements
+
+| Substreams | Average Time to Open Substreams Litep2p |
+|------------|--------------------------------|
+| 1        | 528.738µs |
+| 32        | 2.418918ms |
+| 64        | 3.993045ms |
+| 128        | 8.424956ms |
+| 256        | 11.428443ms |
+
 ## Protocol Specification
 
 The protocol identifier is `/litep2p-perf/1.0.0`, and it operates in two modes, client and server.
@@ -24,7 +34,7 @@ The protocol identifier is `/litep2p-perf/1.0.0`, and it operates in two modes, 
 5. Sends the specified number of bytes to the client.
 
 
-## Examples
+## Network Bandwidth
 
 ### Server
 
@@ -36,4 +46,25 @@ RUST_LOG=info cargo run -- server --listen-address "/ip6/::/tcp/33333" --node-ke
 
 ```bash
 RUST_LOG=info cargo run -- client --server-address "/ip6/::1/tcp/33333/p2p/12D3KooWBpZHDZu7YSbvPaPXKhkRNJvR7MkTJMQQAVBKx9mCqz3q" --upload-bytes 1024 --download-bytes 0
+```
+
+## Time to Open Substreams
+
+### Server
+
+```bash
+RUST_LOG=info cargo run -- server --listen-address "/ip6/::/tcp/33333" --node-key "secret"
+```
+
+### Client
+
+```bash
+RUST_LOG=info cargo run -- client-substream --server-address "/ip6/::1/tcp/33333/p2p/12D3KooWBpZHDZu7YSbvPaPXKhkRNJvR7MkTJMQQAVBKx9mCqz3q" --substreams 32
+```
+
+### Scripted
+
+```bash
+cd litep2p
+./run_substreams.sh
 ```
