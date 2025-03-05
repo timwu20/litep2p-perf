@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "libp2p",
+    "litep2p",
+    "utils",
+]
+
+resolver = "2"
