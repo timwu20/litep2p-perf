@@ -25,11 +25,13 @@ pub enum PerfMode {
 
 pub struct Perf {
     mode: PerfMode,
+    tx: tokio::sync::oneshot::Sender<()>,
 }
 
 impl Perf {
-    pub fn new(mode: PerfMode) -> Self {
-        Self { mode }
+    pub fn new(mode: PerfMode) -> (Self, tokio::sync::oneshot::Receiver<()>) {
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        (Self { mode, tx }, rx)
     }
 
     async fn read_u64(substream: &mut Substream) -> litep2p::Result<u64> {
@@ -172,7 +174,8 @@ impl UserProtocol for Perf {
                                         let total = times.iter().sum::<std::time::Duration>();
                                         let avg = total / num_substreams as u32;
                                         tracing::info!("Average time to open substreams n={num_substreams}, avg={:?}", avg);
-                                        times.clear();
+                                        let _ = self.tx.send(());
+                                        return Ok(());
                                     }
                                 }
                             }

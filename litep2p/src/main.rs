@@ -12,9 +12,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let command = Command::parse();
 
-    let (perf_client, server_address) = match command {
+    let (perf_client, mut perf_handle, server_address) = match command {
         Command::Server(server_opts) => {
-            let perf = Box::new(perf::Perf::new(perf::PerfMode::Server));
+            let (perf, _handle) = perf::Perf::new(perf::PerfMode::Server);
 
             let mut bytes = server_opts.node_key.as_bytes().to_vec();
             if bytes.len() > 32 {
@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     nodelay: true,
                     ..Default::default()
                 })
-                .with_user_protocol(perf)
+                .with_user_protocol(Box::new(perf))
                 .build();
 
             let mut litep2p = litep2p::Litep2p::new(litep2p_config)?;
@@ -50,19 +50,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             return Ok(());
         }
 
-        Command::Client(client_opts) => (
-            Box::new(perf::Perf::new(perf::PerfMode::Client {
+        Command::Client(client_opts) => {
+            let (perf, handle) = perf::Perf::new(perf::PerfMode::Client {
                 upload_bytes: client_opts.upload_bytes as u64,
                 download_bytes: client_opts.download_bytes as u64,
-            })),
-            client_opts.server_address,
-        ),
-        Command::ClientSubstream(client_opts) => (
-            Box::new(perf::Perf::new(perf::PerfMode::ClientSubstream {
+            });
+
+            (perf, handle, client_opts.server_address)
+        }
+        Command::ClientSubstream(client_opts) => {
+            let (perf, handle) = perf::Perf::new(perf::PerfMode::ClientSubstream {
                 substreams: client_opts.substreams,
-            })),
-            client_opts.server_address,
-        ),
+            });
+
+            (perf, handle, client_opts.server_address)
+        }
     };
 
     let litep2p_config = litep2p::config::ConfigBuilder::new()
@@ -71,15 +73,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             nodelay: true,
             ..Default::default()
         })
-        .with_user_protocol(perf_client)
+        .with_user_protocol(Box::new(perf_client))
         .build();
 
     let mut litep2p = litep2p::Litep2p::new(litep2p_config)?;
 
     litep2p.dial_address(server_address.parse()?).await?;
 
-    while let Some(event) = litep2p.next_event().await {
-        tracing::info!("Event: {event:?}");
+    loop {
+        tokio::select! {
+            event = litep2p.next_event() => {
+                if let Some(event) = event {
+                    tracing::info!("Event: {event:?}");
+                }
+            }
+            _ = &mut perf_handle => {
+                break;
+            }
+        }
     }
 
     Ok(())
