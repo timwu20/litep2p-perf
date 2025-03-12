@@ -86,6 +86,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             loop {
                 let event = swarm.next().await;
                 tracing::info!("Even: {:?}", event);
+
+                match event {
+                    Some(SwarmEvent::Behaviour(..)) => {
+                        return Ok(());
+                    }
+                    _ => {}
+                }
             }
         }
         _ => panic!("Command unimplemented"),
