@@ -25,13 +25,13 @@ pub enum PerfMode {
 
 pub struct Perf {
     mode: PerfMode,
-    tx: tokio::sync::oneshot::Sender<()>,
+    tx: Option<tokio::sync::oneshot::Sender<()>>,
 }
 
 impl Perf {
     pub fn new(mode: PerfMode) -> (Self, tokio::sync::oneshot::Receiver<()>) {
         let (tx, rx) = tokio::sync::oneshot::channel();
-        (Self { mode, tx }, rx)
+        (Self { mode, tx: Some(tx) }, rx)
     }
 
     async fn read_u64(substream: &mut Substream) -> litep2p::Result<u64> {
@@ -129,7 +129,7 @@ impl UserProtocol for Perf {
         ProtocolCodec::Unspecified
     }
 
-    async fn run(self: Box<Self>, mut service: TransportService) -> litep2p::Result<()> {
+    async fn run(mut self: Box<Self>, mut service: TransportService) -> litep2p::Result<()> {
         let mut time_to_open = std::time::Instant::now();
         let mut times = Vec::with_capacity(1024);
 
@@ -174,13 +174,14 @@ impl UserProtocol for Perf {
                                         let total = times.iter().sum::<std::time::Duration>();
                                         let avg = total / num_substreams as u32;
                                         tracing::info!("Average time to open substreams n={num_substreams}, avg={:?}", avg);
-                                        let _ = self.tx.send(());
+                                        let _ = self.tx.unwrap().send(());
                                         return Ok(());
                                     }
                                 }
                             }
                         } else {
                             let mode = self.mode.clone();
+                            let tx = self.tx.take().unwrap();
                             tokio::spawn(async move {
                                 match mode {
                                     PerfMode::Server => {
@@ -192,6 +193,8 @@ impl UserProtocol for Perf {
                                         if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
                                             tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
                                         }
+                                        let _ = tx.send(());
+                                        return;
                                     }
                                     _ => {},
                                 }
