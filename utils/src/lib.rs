@@ -1,4 +1,5 @@
 use clap::Parser as ClapParser;
+use clap::ValueEnum;
 use std::time::Duration;
 
 /// Command for interacting with the CLI.
@@ -14,6 +15,22 @@ pub enum Command {
     ClientSubstream(ClientSubstreamOpts),
 }
 
+/// The transport layer to use for the connection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum TransportLayer {
+    /// Use TCP as the transport layer.
+    #[clap(name = "tcp")]
+    Tcp,
+
+    /// Use WebSocket as the transport layer.
+    #[clap(name = "websocket")]
+    WebSocket,
+
+    /// Use WebRTC as the transport layer.
+    #[clap(name = "webrtc")]
+    WebRTC,
+}
+
 /// The server options.
 #[derive(Debug, ClapParser)]
 pub struct ServerOpts {
@@ -24,6 +41,10 @@ pub struct ServerOpts {
     /// The node key used to derive the server peer ID.
     #[clap(long, short)]
     pub node_key: String,
+
+    /// The transport layer to use for the connection.
+    #[clap(long, default_value = "tcp")]
+    pub transport_layer: TransportLayer,
 }
 
 /// The client options.
@@ -40,6 +61,10 @@ pub struct ClientOpts {
     /// The downloaded bytes.
     #[clap(long)]
     pub download_bytes: usize,
+
+    /// The transport layer to use for the connection.
+    #[clap(long, default_value = "tcp")]
+    pub transport_layer: TransportLayer,
 }
 
 /// The client options.
