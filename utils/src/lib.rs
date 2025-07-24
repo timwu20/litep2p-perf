@@ -77,6 +77,10 @@ pub struct ClientSubstreamOpts {
     /// The number of substreams to open.
     #[clap(long)]
     pub substreams: usize,
+
+    /// The transport layer to use for the connection.
+    #[clap(long, default_value = "tcp")]
+    pub transport_layer: TransportLayer,
 }
 
 const KILO: f64 = 1024.0;
