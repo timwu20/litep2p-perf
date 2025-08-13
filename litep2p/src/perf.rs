@@ -163,42 +163,41 @@ impl UserProtocol for Perf {
                         direction,
                         ..
                     }) => {
-                        if let PerfMode::ClientSubstream {..}  = self.mode {
-                            match direction {
-                                litep2p::protocol::Direction::Inbound => {}
-                                litep2p::protocol::Direction::Outbound(..) => {
-                                    tracing::info!("Substream opened in {:?}", time_to_open.elapsed());
+                        match self.mode {
+                            PerfMode::ClientSubstream { .. } => {
+                                match direction {
+                                    litep2p::protocol::Direction::Inbound => {}
+                                    litep2p::protocol::Direction::Outbound(..) => {
+                                        tracing::info!("Substream opened in {:?}", time_to_open.elapsed());
 
-                                    times.push(time_to_open.elapsed());
-                                    if times.len() == num_substreams {
-                                        let total = times.iter().sum::<std::time::Duration>();
-                                        let avg = total / num_substreams as u32;
-                                        tracing::info!("Average time to open substreams n={num_substreams}, avg={:?}", avg);
-                                        let _ = self.tx.unwrap().send(());
-                                        return Ok(());
+                                        times.push(time_to_open.elapsed());
+                                        if times.len() == num_substreams {
+                                            let total = times.iter().sum::<std::time::Duration>();
+                                            let avg = total / num_substreams as u32;
+                                            tracing::info!("Average time to open substreams n={num_substreams}, avg={:?}", avg);
+                                            let _ = self.tx.unwrap().send(());
+                                            return Ok(());
+                                        }
                                     }
                                 }
                             }
-                        } else {
-                            let mode = self.mode.clone();
-                            let tx = self.tx.take().unwrap();
-                            tokio::spawn(async move {
-                                match mode {
-                                    PerfMode::Server => {
-                                        if let Err(e) = Self::server_mode(substream).await {
-                                            tracing::error!(target: LOG_TARGET, "server mode error: {:?}", e);
-                                        }
+                            PerfMode::Server => {
+                                tokio::spawn(async move {
+                                    if let Err(e) = Self::server_mode(substream).await {
+                                        tracing::error!(target: LOG_TARGET, "server mode error: {:?}", e);
                                     }
-                                    PerfMode::Client { upload_bytes, download_bytes } => {
-                                        if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
-                                            tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
-                                        }
-                                        let _ = tx.send(());
-                                        return;
+                                });
+                            }
+                            PerfMode::Client { upload_bytes, download_bytes } => {
+                                let tx = self.tx.take().unwrap();
+                                tokio::spawn(async move {
+                                    if let Err(e) = Self::client_mode(substream, upload_bytes, download_bytes).await {
+                                        tracing::error!(target: LOG_TARGET, "client mode error: {:?}", e);
                                     }
-                                    _ => {},
-                                }
-                            });
+                                    let _ = tx.send(());
+                                    return;
+                                });
+                            },
                         }
                     }
                     _ => {},
