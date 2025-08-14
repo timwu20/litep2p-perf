@@ -54,20 +54,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::Client(client_opts) => {
             let local_key = libp2p::identity::Keypair::generate_ed25519();
 
-            let tcp_config = libp2p::tcp::Config::new().nodelay(true);
-            let mut swarm = libp2p::SwarmBuilder::with_existing_identity(local_key)
-                .with_tokio()
-                .with_tcp(
-                    tcp_config,
-                    libp2p_noise::Config::new,
-                    libp2p_yamux::Config::default,
-                )?
-                .with_dns()?
-                .with_behaviour(|_key| crate::client::behaviour::Behaviour::new())?
-                .with_swarm_config(|cfg| {
-                    cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
-                })
-                .build();
+            let mut swarm = match client_opts.transport_layer {
+                utils::TransportLayer::Tcp => {
+                    let tcp_config = libp2p::tcp::Config::new().nodelay(true);
+                    libp2p::SwarmBuilder::with_existing_identity(local_key)
+                        .with_tokio()
+                        .with_tcp(
+                            tcp_config,
+                            libp2p_noise::Config::new,
+                            libp2p_yamux::Config::default,
+                        )?
+                        .with_dns()?
+                        .with_behaviour(|_key| crate::client::behaviour::Behaviour::new())?
+                        .with_swarm_config(|cfg| {
+                            cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
+                        })
+                        .build()
+                }
+                utils::TransportLayer::WebSocket => {
+                    unimplemented!("WebSocket transport layer not implemented yet");
+                }
+                utils::TransportLayer::WebRTC => {
+                    unimplemented!("WebRTC transport layer not implemented yet");
+                }
+            };
 
             let addr: libp2p::Multiaddr = client_opts.server_address.parse()?;
             swarm.dial(addr)?;
