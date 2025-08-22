@@ -51,15 +51,36 @@ async fn send_bytes<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
 pub async fn server_mode<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     mut substream: S,
 ) -> Result<(), std::io::Error> {
+    tracing::info!(target: LOG_TARGET, "Server mode started");
     // Step 1. Read the download bytes.
     let to_recv = read_u64(&mut substream).await?;
+    tracing::info!(
+        target: LOG_TARGET,
+        "Read download bytes: {}",
+        utils::format_bytes(to_recv as usize)
+    );
     // Step 2. Receive the download bytes.
     recv_bytes(&mut substream, to_recv).await?;
+    tracing::info!(
+        target: LOG_TARGET,
+        "Received download bytes: {}",
+        utils::format_bytes(to_recv as usize)
+    );
 
     // Step 3. Read the upload bytes.
     let to_send = read_u64(&mut substream).await?;
+    tracing::info!(
+        target: LOG_TARGET,
+        "Read upload bytes: {}",
+        utils::format_bytes(to_send as usize)
+    );
     // Step 4. Send the upload bytes.
     send_bytes(&mut substream, to_send).await?;
+    tracing::info!(
+        target: LOG_TARGET,
+        "Sent upload bytes: {}",
+        utils::format_bytes(to_send as usize)
+    );
 
     Ok(())
 }
@@ -84,6 +105,11 @@ pub async fn client_mode<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     );
     // Step 3. Send the download bytes.
     write_u64(&mut substream, download_bytes).await?;
+    tracing::info!(
+        target: LOG_TARGET,
+        "Sent download bytes: {}",
+        utils::format_bytes(download_bytes as usize)
+    );
     // Step 4. Receive the download bytes.
     let now = std::time::Instant::now();
     recv_bytes(&mut substream, download_bytes).await?;
