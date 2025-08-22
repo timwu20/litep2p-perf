@@ -1,6 +1,11 @@
 use clap::Parser as ClapParser;
 use futures::StreamExt;
+use libp2p::PeerId;
 use libp2p_swarm::SwarmEvent;
+use rand::thread_rng;
+use libp2p::multiaddr::{Multiaddr, Protocol};
+use libp2p::core::{muxing::StreamMuxerBox, Transport};
+use std::net::Ipv4Addr;
 
 use utils::Command;
 
@@ -29,20 +34,53 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let local_key = libp2p::identity::ed25519::Keypair::from(secret_key);
             let local_key: libp2p::identity::Keypair = local_key.into();
 
-            let tcp_config = libp2p::tcp::Config::new().nodelay(true);
-            let mut swarm = libp2p::SwarmBuilder::with_existing_identity(local_key)
-                .with_tokio()
-                .with_tcp(
-                    tcp_config,
-                    libp2p_noise::Config::new,
-                    libp2p_yamux::Config::default,
-                )?
-                .with_dns()?
-                .with_behaviour(|_key| crate::server::behaviour::Behaviour::new())?
-                .with_swarm_config(|cfg| {
-                    cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
-                })
-                .build();
+            let mut swarm = match server_opts.transport_layer {
+                utils::TransportLayer::Tcp => {
+                    let tcp_config = libp2p::tcp::Config::new().nodelay(true);
+                    libp2p::SwarmBuilder::with_existing_identity(local_key)
+                        .with_tokio()
+                        .with_tcp(
+                            tcp_config,
+                            libp2p_noise::Config::new,
+                            libp2p_yamux::Config::default,
+                        )?
+                        .with_dns()?
+                        .with_behaviour(|_key| crate::server::behaviour::Behaviour::new())?
+                        .with_swarm_config(|cfg| {
+                            cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
+                        })
+                        .build()
+                }
+                utils::TransportLayer::WebSocket => {
+                    unimplemented!("WebSocket transport layer not implemented yet");
+                }
+                utils::TransportLayer::WebRTC => {
+
+                    let address_webrtc = Multiaddr::from(Ipv4Addr::UNSPECIFIED)
+                        .with(Protocol::Udp(0))
+                        .with(Protocol::WebRTCDirect);
+
+                    println!("Using WebRTC transport layer with address: {}", address_webrtc);
+
+
+                    libp2p::SwarmBuilder::with_existing_identity(local_key)
+                        .with_tokio()
+                        .with_other_transport(|key| {
+                            // libp2p_webrtc::tokio::Transport::new(key.clone(), Certificate::generate(&mut thread_rng()).unwrap())
+                            Ok(libp2p_webrtc::tokio::Transport::new(
+                                key.clone(),
+                                libp2p_webrtc::tokio::Certificate::generate(&mut thread_rng())?,
+                            )
+                            .map(|(peer_id, conn), _| (peer_id, StreamMuxerBox::new(conn))))
+                        })?
+                        // .with_dns()?
+                        .with_behaviour(|_key| crate::server::behaviour::Behaviour::new())?
+                        .with_swarm_config(|cfg| {
+                            cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
+                        })
+                        .build()
+                }
+            };
 
             swarm.listen_on(server_opts.listen_address.parse()?)?;
 
@@ -75,23 +113,51 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     unimplemented!("WebSocket transport layer not implemented yet");
                 }
                 utils::TransportLayer::WebRTC => {
-                    unimplemented!("WebRTC transport layer not implemented yet");
+                    let mut swarm = libp2p::SwarmBuilder::with_existing_identity(local_key)
+                        .with_tokio()
+                        .with_other_transport(|key| {
+                            // libp2p_webrtc::tokio::Transport::new(key.clone(), Certificate::generate(&mut thread_rng()).unwrap())
+                            Ok(libp2p_webrtc::tokio::Transport::new(
+                                key.clone(),
+                                libp2p_webrtc::tokio::Certificate::generate(&mut thread_rng())?,
+                            )
+                            .map(|(peer_id, conn), _| (peer_id, StreamMuxerBox::new(conn))))
+                        })?
+                        // .with_dns()?
+                        .with_behaviour(|_key| crate::client::behaviour::Behaviour::new())?
+                        .with_swarm_config(|cfg| {
+                            cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
+                        })
+                        .build();
+                    
+                    let listen_addr = "/ip4/0.0.0.0/udp/0/webrtc-direct".parse()?;
+                    swarm.listen_on(listen_addr)?;
+
+                    swarm
+
                 }
             };
 
             let addr: libp2p::Multiaddr = client_opts.server_address.parse()?;
             swarm.dial(addr)?;
 
-            let server_peer_id = match swarm.next().await.unwrap() {
-                SwarmEvent::ConnectionEstablished { peer_id, .. } => peer_id,
-                e => panic!("{e:?}"),
-            };
+            loop {
+                let event = swarm.next().await;
+                tracing::info!("Event: {:?}", event);
 
-            swarm.behaviour_mut().perf(
-                server_peer_id,
-                client_opts.upload_bytes as u64,
-                client_opts.download_bytes as u64,
-            )?;
+                match event {
+                    Some(SwarmEvent::ConnectionEstablished { peer_id, .. }) => {
+                        swarm.behaviour_mut().perf(
+                            peer_id,
+                            client_opts.upload_bytes as u64,
+                            client_opts.download_bytes as u64,
+                        )?;
+                        println!("done");
+                        break;
+                    }
+                    _ => {}
+                }
+            }
 
             loop {
                 let event = swarm.next().await;
