@@ -1,6 +1,5 @@
 use clap::Parser as ClapParser;
 use futures::StreamExt;
-use libp2p::PeerId;
 use libp2p_swarm::SwarmEvent;
 use rand::thread_rng;
 use libp2p::multiaddr::{Multiaddr, Protocol};
@@ -55,25 +54,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     unimplemented!("WebSocket transport layer not implemented yet");
                 }
                 utils::TransportLayer::WebRTC => {
-
                     let address_webrtc = Multiaddr::from(Ipv4Addr::UNSPECIFIED)
                         .with(Protocol::Udp(0))
                         .with(Protocol::WebRTCDirect);
 
-                    println!("Using WebRTC transport layer with address: {}", address_webrtc);
-
+                    tracing::info!("Using WebRTC transport layer with address: {}", address_webrtc);
 
                     libp2p::SwarmBuilder::with_existing_identity(local_key)
                         .with_tokio()
                         .with_other_transport(|key| {
-                            // libp2p_webrtc::tokio::Transport::new(key.clone(), Certificate::generate(&mut thread_rng()).unwrap())
                             Ok(libp2p_webrtc::tokio::Transport::new(
                                 key.clone(),
                                 libp2p_webrtc::tokio::Certificate::generate(&mut thread_rng())?,
                             )
                             .map(|(peer_id, conn), _| (peer_id, StreamMuxerBox::new(conn))))
                         })?
-                        // .with_dns()?
+                        .with_dns()?
                         .with_behaviour(|_key| crate::server::behaviour::Behaviour::new())?
                         .with_swarm_config(|cfg| {
                             cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
@@ -116,25 +112,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let mut swarm = libp2p::SwarmBuilder::with_existing_identity(local_key)
                         .with_tokio()
                         .with_other_transport(|key| {
-                            // libp2p_webrtc::tokio::Transport::new(key.clone(), Certificate::generate(&mut thread_rng()).unwrap())
                             Ok(libp2p_webrtc::tokio::Transport::new(
                                 key.clone(),
                                 libp2p_webrtc::tokio::Certificate::generate(&mut thread_rng())?,
                             )
                             .map(|(peer_id, conn), _| (peer_id, StreamMuxerBox::new(conn))))
                         })?
-                        // .with_dns()?
+                        .with_dns()?
                         .with_behaviour(|_key| crate::client::behaviour::Behaviour::new())?
                         .with_swarm_config(|cfg| {
                             cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
                         })
                         .build();
                     
-                    let listen_addr = "/ip4/0.0.0.0/udp/0/webrtc-direct".parse()?;
+                    let listen_addr = Multiaddr::from(Ipv4Addr::UNSPECIFIED)
+                        .with(Protocol::Udp(0))
+                        .with(Protocol::WebRTCDirect);
                     swarm.listen_on(listen_addr)?;
 
                     swarm
-
                 }
             };
 
@@ -144,7 +140,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             loop {
                 let event = swarm.next().await;
                 tracing::info!("Event: {:?}", event);
-
                 match event {
                     Some(SwarmEvent::ConnectionEstablished { peer_id, .. }) => {
                         swarm.behaviour_mut().perf(
@@ -152,18 +147,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             client_opts.upload_bytes as u64,
                             client_opts.download_bytes as u64,
                         )?;
-                        println!("done");
-                        break;
-                    }
-                    _ => {}
-                }
-            }
-
-            loop {
-                let event = swarm.next().await;
-                tracing::info!("Even: {:?}", event);
-
-                match event {
+                    },
                     Some(SwarmEvent::Behaviour(..)) => {
                         return Ok(());
                     }

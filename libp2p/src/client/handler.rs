@@ -139,14 +139,13 @@ impl ConnectionHandler for Handler {
             // TODO: remove when Rust 1.82 is MSRV
             #[allow(unreachable_patterns)]
             ConnectionEvent::ListenUpgradeError(ListenUpgradeError { info: (), error }) => {
-                // void::unreachable(error)
                 panic!("ListenUpgradeError should not occur in this context: {:?}", error);
             }
             _ => {}
         }
     }
 
-    #[tracing::instrument(level = "info", name = "ConnectionHandler::poll", skip(self, cx))]
+    #[tracing::instrument(level = "trace", name = "ConnectionHandler::poll", skip(self, cx))]
     fn poll(
         &mut self,
         cx: &mut Context<'_>,
@@ -156,7 +155,6 @@ impl ConnectionHandler for Handler {
         }
 
         if let Poll::Ready(Some((id, result))) = self.outbound.poll_next_unpin(cx) {
-            println!("Outbound result: {:?}", result);
             return Poll::Ready(ConnectionHandlerEvent::NotifyBehaviour(Event {
                 id,
                 result: result.map_err(|err| err.to_string()),
