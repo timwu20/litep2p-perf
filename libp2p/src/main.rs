@@ -1,9 +1,9 @@
 use clap::Parser as ClapParser;
 use futures::StreamExt;
+use libp2p::core::{Transport, muxing::StreamMuxerBox};
+use libp2p::multiaddr::{Multiaddr, Protocol};
 use libp2p_swarm::SwarmEvent;
 use rand::thread_rng;
-use libp2p::multiaddr::{Multiaddr, Protocol};
-use libp2p::core::{muxing::StreamMuxerBox, Transport};
 use std::net::Ipv4Addr;
 
 use utils::Command;
@@ -58,7 +58,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .with(Protocol::Udp(0))
                         .with(Protocol::WebRTCDirect);
 
-                    tracing::info!("Using WebRTC transport layer with address: {}", address_webrtc);
+                    tracing::info!(
+                        "Using WebRTC transport layer with address: {}",
+                        address_webrtc
+                    );
 
                     libp2p::SwarmBuilder::with_existing_identity(local_key)
                         .with_tokio()
@@ -124,7 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             cfg.with_idle_connection_timeout(std::time::Duration::from_secs(60))
                         })
                         .build();
-                    
+
                     let listen_addr = Multiaddr::from(Ipv4Addr::UNSPECIFIED)
                         .with(Protocol::Udp(0))
                         .with(Protocol::WebRTCDirect);
@@ -147,7 +150,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             client_opts.upload_bytes as u64,
                             client_opts.download_bytes as u64,
                         )?;
-                    },
+                    }
                     Some(SwarmEvent::Behaviour(..)) => {
                         return Ok(());
                     }
