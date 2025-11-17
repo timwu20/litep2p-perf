@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-async-trait = "0.1"
 clap = { version = "4.5.31", features = ["derive", "cargo"] }
 tokio = { version = "1.28", features = ["macros", "time", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -12,16 +11,15 @@ tracing = "0.1.34"
 futures = "0.3.28"
 
 thiserror = "2.0.16"
-futures-bounded = "0.2.4"
 
-libp2p = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3", features = ["dns", "identify", "kad", "macros", "mdns", "noise", "ping", "tcp",  "tokio", "yamux", "websocket", "request-response"] }
-libp2p-core = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3" }
-libp2p-swarm = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3" }
+libp2p = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d", features = ["dns", "identify", "kad", "macros", "mdns", "noise", "ping", "tcp",  "tokio", "yamux", "websocket", "request-response"] }
+libp2p-core = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d" }
+libp2p-swarm = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d" }
 libp2p-identity = { version = "0.2.12", features = ["ed25519", "peerid", "rand"] }
-libp2p-tls = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3" }
-libp2p-noise = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3" }
-libp2p-webrtc = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3", features = ["tokio"] }
-libp2p-yamux = { git = "https://github.com/timwu20/rust-libp2p", rev = "8bdee16f4dc345eb2a4d63246bb8739f16353cc3" }
+libp2p-noise = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d" }
+libp2p-webrtc = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d", features = ["tokio"] }
+libp2p-yamux = { git = "https://github.com/ChainSafe/rust-libp2p", rev = "6accaf64eec35cffc2807af6b3b1eba10303058d" }
+
 void = "1"
 
 utils = { path = "../utils" }
