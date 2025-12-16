@@ -114,48 +114,47 @@ cd litep2p
 
 ### Bandwidth
 
-| Operation  | Bytes      | Litep2p->Litep2p | Libp2p->Libp2p | Libp2p->Libp2p | Libp2p->Litep2p | Libp2p->Litep2p | Litep2p->Libp2p |
-|            |            | (TCP)            | (TCP)          | (WebRTC)       | (TCP)           | (WebRTC)        | (TCP)           |
-|------------|------------|------------------|----------------|----------------|-----------------|-----------------|-----------------|
-| Uploaded   | 1.0KiB | 3.46 Gbit/s | 3.16 Gbit/s | 1.17 Gbit/s | 4.36 Gbit/s | 225.36 Mbit/s | 3.74 Gbit/s |
-| Uploaded   | 2.0KiB | 9.39 Gbit/s | 5.23 Gbit/s | 796.18 Mbit/s | 1.85 Gbit/s | 429.06 Mbit/s | 2.54 Gbit/s |
-| Uploaded   | 4.0KiB | 2.15 Gbit/s | 6.37 Gbit/s | 1.23 Gbit/s | 8.05 Gbit/s | 370.01 Mbit/s | 3.45 Gbit/s |
-| Uploaded   | 8.0KiB | 7.11 Gbit/s | 5.09 Gbit/s | 1.46 Gbit/s | 5.66 Gbit/s | 515.82 Mbit/s | 5.79 Gbit/s |
-| Uploaded   | 16KiB | 838.46 Mbit/s | 373.74 Mbit/s | 1.68 Gbit/s | 391.24 Mbit/s | 532.77 Mbit/s | 800.64 Mbit/s |
-| Uploaded   | 32KiB | 555.92 Mbit/s | 348.37 Mbit/s | 1.69 Gbit/s | 299.48 Mbit/s | 1.20 Gbit/s | 453.10 Mbit/s |
-| Uploaded   | 64KiB | 436.65 Mbit/s | 353.20 Mbit/s | 1.74 Gbit/s | 538.50 Mbit/s | 1.73 Gbit/s | 432.45 Mbit/s |
-| Uploaded   | 128KiB | 357.14 Mbit/s | 388.14 Mbit/s | 3.45 Gbit/s | 341.68 Mbit/s | 681.16 Mbit/s | 414.52 Mbit/s |
-| Uploaded   | 256KiB | 482.24 Mbit/s | 323.69 Mbit/s | 51.57 Mbit/s | 321.55 Mbit/s | 60.10 Mbit/s | 349.15 Mbit/s |
-| Uploaded   | 512KiB | 420.43 Mbit/s | 349.45 Mbit/s | 47.77 Mbit/s | 393.10 Mbit/s | 46.43 Mbit/s | 362.95 Mbit/s |
-| Uploaded   | 1.0MiB | 452.06 Mbit/s | 382.80 Mbit/s | 34.42 Mbit/s | 405.66 Mbit/s | 35.68 Mbit/s | 396.46 Mbit/s |
-| Uploaded   | 2.0MiB | 476.54 Mbit/s | 468.72 Mbit/s | 33.50 Mbit/s | 454.18 Mbit/s | 33.54 Mbit/s | 484.36 Mbit/s |
-| Uploaded   | 4.0MiB | 602.35 Mbit/s | 542.05 Mbit/s | 32.51 Mbit/s | 529.74 Mbit/s | 31.15 Mbit/s | 595.09 Mbit/s |
-| Uploaded   | 8.0MiB | 731.84 Mbit/s | 597.95 Mbit/s | 32.05 Mbit/s | 587.44 Mbit/s | 31.37 Mbit/s | 723.80 Mbit/s |
-| Uploaded   | 16MiB | 745.03 Mbit/s | 616.75 Mbit/s | 31.83 Mbit/s | 617.36 Mbit/s | 30.80 Mbit/s | 756.98 Mbit/s |
-| Uploaded   | 32MiB | 753.37 Mbit/s | 631.18 Mbit/s | 31.65 Mbit/s | 644.45 Mbit/s | n/a | 778.50 Mbit/s |
-| Uploaded   | 64MiB | 806.63 Mbit/s | 635.26 Mbit/s | 31.68 Mbit/s | 632.70 Mbit/s | n/a | 784.85 Mbit/s |
-| Uploaded   | 128MiB | 879.59 Mbit/s | 635.71 Mbit/s | 31.03 Mbit/s | 637.97 Mbit/s | n/a | 764.72 Mbit/s |
-| Uploaded   | 256MiB | 867.99 Mbit/s | 643.30 Mbit/s | 31.42 Mbit/s | 698.84 Mbit/s | n/a | 803.06 Mbit/s |
-| Uploaded   | 512MiB | 871.38 Mbit/s | 652.90 Mbit/s | 31.16 Mbit/s | 620.08 Mbit/s | n/a | 808.02 Mbit/s |
-| Uploaded   | 1.0GiB | 882.42 Mbit/s | 643.92 Mbit/s | 31.39 Mbit/s | 630.04 Mbit/s | n/a | 813.40 Mbit/s |
-| Downloaded | 1.0KiB | 32.95 Mbit/s | 22.49 Mbit/s | 3.77 Mbit/s | 28.53 Mbit/s | 2.36 Mbit/s | 23.87 Mbit/s |
-| Downloaded | 2.0KiB | 63.92 Mbit/s | 50.13 Mbit/s | 4.88 Mbit/s | 52.36 Mbit/s | 3.45 Mbit/s | 45.08 Mbit/s |
-| Downloaded | 4.0KiB | 81.83 Mbit/s | 77.48 Mbit/s | 6.82 Mbit/s | 130.75 Mbit/s | 3.54 Mbit/s | 63.33 Mbit/s |
-| Downloaded | 8.0KiB | 141.94 Mbit/s | 102.54 Mbit/s | 7.62 Mbit/s | 114.75 Mbit/s | 3.58 Mbit/s | 100.94 Mbit/s |
-| Downloaded | 16KiB | 195.20 Mbit/s | 169.77 Mbit/s | 9.33 Mbit/s | 190.36 Mbit/s | 5.22 Mbit/s | 141.49 Mbit/s |
-| Downloaded | 32KiB | 197.94 Mbit/s | 288.42 Mbit/s | 10.47 Mbit/s | 252.40 Mbit/s | 6.81 Mbit/s | 196.53 Mbit/s |
-| Downloaded | 64KiB | 225.54 Mbit/s | 286.09 Mbit/s | 11.81 Mbit/s | 296.95 Mbit/s | 10.00 Mbit/s | 275.46 Mbit/s |
-| Downloaded | 128KiB | 297.69 Mbit/s | 325.77 Mbit/s | 13.88 Mbit/s | 327.18 Mbit/s | 11.41 Mbit/s | 278.86 Mbit/s |
-| Downloaded | 256KiB | 413.71 Mbit/s | 357.56 Mbit/s | 19.97 Mbit/s | 351.91 Mbit/s | 18.07 Mbit/s | 351.01 Mbit/s |
-| Downloaded | 512KiB | 408.00 Mbit/s | 405.74 Mbit/s | 22.14 Mbit/s | 399.83 Mbit/s | 22.16 Mbit/s | 400.23 Mbit/s |
-| Downloaded | 1.0MiB | 505.80 Mbit/s | 513.97 Mbit/s | 28.11 Mbit/s | 581.64 Mbit/s | n/a | 504.74 Mbit/s |
-| Downloaded | 2.0MiB | 777.57 Mbit/s | 638.82 Mbit/s | 29.31 Mbit/s | 775.99 Mbit/s | n/a | 666.08 Mbit/s |
-| Downloaded | 4.0MiB | 844.21 Mbit/s | 651.80 Mbit/s | 29.96 Mbit/s | 774.64 Mbit/s | n/a | 715.37 Mbit/s |
-| Downloaded | 8.0MiB | 792.89 Mbit/s | 641.97 Mbit/s | 31.05 Mbit/s | 784.99 Mbit/s | n/a | 683.01 Mbit/s |
-| Downloaded | 16MiB | 803.64 Mbit/s | 626.76 Mbit/s | 31.46 Mbit/s | 745.87 Mbit/s | n/a | 688.40 Mbit/s |
-| Downloaded | 32MiB | 779.37 Mbit/s | 633.95 Mbit/s | 31.48 Mbit/s | 760.55 Mbit/s | n/a | 691.93 Mbit/s |
-| Downloaded | 64MiB | 804.71 Mbit/s | 635.22 Mbit/s | 31.53 Mbit/s | 752.78 Mbit/s | n/a | 690.73 Mbit/s |
-| Downloaded | 128MiB | 862.24 Mbit/s | 637.05 Mbit/s | 31.18 Mbit/s | 782.09 Mbit/s | n/a | 621.61 Mbit/s |
-| Downloaded | 256MiB | 858.61 Mbit/s | 636.08 Mbit/s | 31.53 Mbit/s | 788.31 Mbit/s | n/a | 694.58 Mbit/s |
-| Downloaded | 512MiB | 861.56 Mbit/s | 637.50 Mbit/s | 31.19 Mbit/s | 738.45 Mbit/s | n/a | 692.77 Mbit/s |
-| Downloaded | 1.0GiB | 872.73 Mbit/s | 619.31 Mbit/s | 31.04 Mbit/s | 744.37 Mbit/s | n/a | 687.94 Mbit/s |
+| Operation  | Bytes  | Litep2p->Litep2p (TCP) | Libp2p->Libp2p (TCP) | Libp2p->Libp2p (WebRTC) | Libp2p->Litep2p (TCP) | Libp2p->Litep2p (WebRTC) | Litep2p->Libp2p (TCP) |
+|------------|--------|------------------------|----------------------|-------------------------|-----------------------|--------------------------|-----------------------|
+| Uploaded   | 1.0KiB | 3.98 Gbit/s            | 2.35 Gbit/s          | 563.06 Mbit/s           | 3.39 Gbit/s           | 452.90 Mbit/s            | 3.81 Gbit/s           |
+| Uploaded   | 2.0KiB | 5.91 Gbit/s            | 3.70 Gbit/s          | 1.24 Gbit/s             | 4.88 Gbit/s           | 539.56 Mbit/s            | 6.54 Gbit/s           |
+| Uploaded   | 4.0KiB | 4.73 Gbit/s            | 2.81 Gbit/s          | 1.95 Gbit/s             | 6.05 Gbit/s           | 641.58 Mbit/s            | 4.73 Gbit/s           |
+| Uploaded   | 8.0KiB | 10.10 Gbit/s           | 3.65 Gbit/s          | 2.27 Gbit/s             | 3.71 Gbit/s           | 354.69 Mbit/s            | 9.70 Gbit/s           |
+| Uploaded   | 16KiB  | 1001.33 Mbit/s         | 409.11 Mbit/s        | 1.62 Gbit/s             | 425.71 Mbit/s         | 784.52 Mbit/s            | 647.39 Mbit/s         |
+| Uploaded   | 32KiB  | 734.21 Mbit/s          | 323.24 Mbit/s        | 1.92 Gbit/s             | 329.58 Mbit/s         | 696.38 Mbit/s            | 521.65 Mbit/s         |
+| Uploaded   | 64KiB  | 426.85 Mbit/s          | 417.23 Mbit/s        | 1.89 Gbit/s             | 404.08 Mbit/s         | 804.18 Mbit/s            | 465.50 Mbit/s         |
+| Uploaded   | 128KiB | 385.00 Mbit/s          | 388.95 Mbit/s        | 2.06 Gbit/s             | 360.21 Mbit/s         | 673.44 Mbit/s            | 408.18 Mbit/s         |
+| Uploaded   | 256KiB | 379.18 Mbit/s          | 392.68 Mbit/s        | 83.72 Mbit/s            | 505.00 Mbit/s         | 49.55 Mbit/s             | 395.67 Mbit/s         |
+| Uploaded   | 512KiB | 476.20 Mbit/s          | 411.87 Mbit/s        | 43.52 Mbit/s            | 531.37 Mbit/s         | 41.83 Mbit/s             | 419.62 Mbit/s         |
+| Uploaded   | 1.0MiB | 465.22 Mbit/s          | 426.62 Mbit/s        | 40.60 Mbit/s            | 410.64 Mbit/s         | 36.77 Mbit/s             | 470.99 Mbit/s         |
+| Uploaded   | 2.0MiB | 518.01 Mbit/s          | 501.62 Mbit/s        | 35.07 Mbit/s            | 472.82 Mbit/s         | 33.27 Mbit/s             | 503.70 Mbit/s         |
+| Uploaded   | 4.0MiB | 680.79 Mbit/s          | 587.54 Mbit/s        | 33.75 Mbit/s            | 587.76 Mbit/s         | 33.46 Mbit/s             | 673.93 Mbit/s         |
+| Uploaded   | 8.0MiB | 802.99 Mbit/s          | 650.43 Mbit/s        | 32.92 Mbit/s            | 650.16 Mbit/s         | 33.60 Mbit/s             | 768.98 Mbit/s         |
+| Uploaded   | 16MiB  | 854.45 Mbit/s          | 703.67 Mbit/s        | 32.99 Mbit/s            | 685.35 Mbit/s         | 33.76 Mbit/s             | 787.97 Mbit/s         |
+| Uploaded   | 32MiB  | 921.60 Mbit/s          | 708.99 Mbit/s        | 32.72 Mbit/s            | 728.34 Mbit/s         | 33.68 Mbit/s             | 818.49 Mbit/s         |
+| Uploaded   | 64MiB  | 957.68 Mbit/s          | 710.41 Mbit/s        | 32.42 Mbit/s            | 730.43 Mbit/s         | 33.61 Mbit/s             | 836.55 Mbit/s         |
+| Uploaded   | 128MiB | 961.15 Mbit/s          | 717.94 Mbit/s        | 32.29 Mbit/s            | 749.60 Mbit/s         | 33.55 Mbit/s             | 852.71 Mbit/s         |
+| Uploaded   | 256MiB | 882.12 Mbit/s          | 719.77 Mbit/s        | 32.23 Mbit/s            | 761.55 Mbit/s         | 33.48 Mbit/s             | 858.93 Mbit/s         |
+| Uploaded   | 512MiB | 920.68 Mbit/s          | 716.89 Mbit/s        | 32.17 Mbit/s            | 763.27 Mbit/s         | 33.46 Mbit/s             | 860.74 Mbit/s         |
+| Uploaded   | 1.0GiB | 985.91 Mbit/s          | 712.41 Mbit/s        | 32.37 Mbit/s            | 766.33 Mbit/s         | n/a                      | 868.62 Mbit/s         |
+| Downloaded | 1.0KiB | 30.64 Mbit/s           | 36.34 Mbit/s         | 4.15 Mbit/s             | 29.32 Mbit/s          | 3.03 Mbit/s              | 27.98 Mbit/s          |
+| Downloaded | 2.0KiB | 49.42 Mbit/s           | 44.87 Mbit/s         | 7.21 Mbit/s             | 56.93 Mbit/s          | 3.08 Mbit/s              | 45.70 Mbit/s          |
+| Downloaded | 4.0KiB | 73.04 Mbit/s           | 81.47 Mbit/s         | 9.29 Mbit/s             | 86.36 Mbit/s          | 3.93 Mbit/s              | 88.12 Mbit/s          |
+| Downloaded | 8.0KiB | 112.38 Mbit/s          | 119.77 Mbit/s        | 9.18 Mbit/s             | 120.23 Mbit/s         | 3.81 Mbit/s              | 118.11 Mbit/s         |
+| Downloaded | 16KiB  | 281.27 Mbit/s          | 175.84 Mbit/s        | 9.30 Mbit/s             | 204.14 Mbit/s         | 5.53 Mbit/s              | 161.08 Mbit/s         |
+| Downloaded | 32KiB  | 267.69 Mbit/s          | 341.53 Mbit/s        | 10.42 Mbit/s            | 342.02 Mbit/s         | 7.12 Mbit/s              | 201.18 Mbit/s         |
+| Downloaded | 64KiB  | 271.50 Mbit/s          | 331.55 Mbit/s        | 12.16 Mbit/s            | 425.94 Mbit/s         | 8.29 Mbit/s              | 278.07 Mbit/s         |
+| Downloaded | 128KiB | 310.64 Mbit/s          | 355.65 Mbit/s        | 14.05 Mbit/s            | 363.56 Mbit/s         | 11.03 Mbit/s             | 336.00 Mbit/s         |
+| Downloaded | 256KiB | 375.84 Mbit/s          | 394.35 Mbit/s        | 18.58 Mbit/s            | 443.98 Mbit/s         | 18.84 Mbit/s             | 378.60 Mbit/s         |
+| Downloaded | 512KiB | 512.30 Mbit/s          | 463.59 Mbit/s        | 24.55 Mbit/s            | 495.57 Mbit/s         | 23.94 Mbit/s             | 436.09 Mbit/s         |
+| Downloaded | 1.0MiB | 540.09 Mbit/s          | 598.67 Mbit/s        | 26.51 Mbit/s            | 569.77 Mbit/s         | 29.25 Mbit/s             | 513.71 Mbit/s         |
+| Downloaded | 2.0MiB | 879.67 Mbit/s          | 645.99 Mbit/s        | 29.98 Mbit/s            | 836.44 Mbit/s         | 34.31 Mbit/s             | 642.60 Mbit/s         |
+| Downloaded | 4.0MiB | 982.02 Mbit/s          | 713.97 Mbit/s        | 31.21 Mbit/s            | 845.34 Mbit/s         | 35.21 Mbit/s             | 769.42 Mbit/s         |
+| Downloaded | 8.0MiB | 978.81 Mbit/s          | 748.43 Mbit/s        | 32.15 Mbit/s            | 879.50 Mbit/s         | 36.03 Mbit/s             | 744.14 Mbit/s         |
+| Downloaded | 16MiB  | 867.09 Mbit/s          | 711.13 Mbit/s        | 32.45 Mbit/s            | 831.28 Mbit/s         | 36.29 Mbit/s             | 740.03 Mbit/s         |
+| Downloaded | 32MiB  | 964.77 Mbit/s          | 719.94 Mbit/s        | 32.44 Mbit/s            | 849.40 Mbit/s         | 36.24 Mbit/s             | 726.23 Mbit/s         |
+| Downloaded | 64MiB  | 970.98 Mbit/s          | 716.00 Mbit/s        | 32.49 Mbit/s            | 841.98 Mbit/s         | 36.24 Mbit/s             | 748.07 Mbit/s         |
+| Downloaded | 128MiB | 933.48 Mbit/s          | 705.87 Mbit/s        | 32.45 Mbit/s            | 844.31 Mbit/s         | 36.62 Mbit/s             | 754.59 Mbit/s         |
+| Downloaded | 256MiB | 920.71 Mbit/s          | 707.10 Mbit/s        | 32.38 Mbit/s            | 850.48 Mbit/s         | 36.60 Mbit/s             | 750.82 Mbit/s         |
+| Downloaded | 512MiB | 951.07 Mbit/s          | 712.52 Mbit/s        | 32.45 Mbit/s            | 852.45 Mbit/s         | 36.40 Mbit/s             | 744.70 Mbit/s         |
+| Downloaded | 1.0GiB | 964.81 Mbit/s          | 700.56 Mbit/s        | 32.64 Mbit/s            | 849.49 Mbit/s         | n/a                      | 757.75 Mbit/s         |
