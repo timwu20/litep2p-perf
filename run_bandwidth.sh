@@ -239,9 +239,8 @@ kill $SERVER_PID
 # Markdown output
 echo
 echo "# Bandwidth Report"
-echo "| Operation  | Bytes      | Litep2p->Litep2p | Libp2p->Libp2p | Libp2p->Libp2p | Libp2p->Litep2p | Libp2p->Litep2p | Litep2p->Libp2p |"
-echo "|            |            | (TCP)            | (TCP)          | (WebRTC)       | (TCP)           | (WebRTC)        | (TCP)           |"
-echo "|------------|------------|------------------|----------------|----------------|-----------------|-----------------|-----------------|"
+echo "| Operation  | Bytes      | Litep2p->Litep2p (TCP) | Libp2p->Libp2p (TCP) | Libp2p->Libp2p (WebRTC) | Libp2p->Litep2p (TCP) | Libp2p->Litep2p (WebRTC) | Litep2p->Libp2p (TCP) |"
+echo "|------------|------------|------------------------|----------------------|-------------------------|-----------------------|--------------------------|-----------------------|"
 
 for bytes in $VALUES; do
     fmt_bytes=$(numfmt --to=iec-i --suffix=B $bytes)
