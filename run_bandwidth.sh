@@ -90,7 +90,6 @@ done
 # Kill the server
 kill $SERVER_PID
 
-
 # ---------------------------------------------------------
 # Libp2p (WebRTC) bandwidth test
 # ---------------------------------------------------------
@@ -181,8 +180,9 @@ CERT_HASH=$(grep "/certhash/" server.log | cut -d '/' -f 8 | cut -d ' ' -f 1 | h
 VALUES_ARRAY=($VALUES)
 
 cd ../libp2p
-# Only do both up- and download up to 512kB because downloading from litep2p to libp2p is too damn slow. :(
-for bytes in "${VALUES_ARRAY[@]:0:10}"; do
+# Only do up- and download up to 512MiB. 1GiB still doesn't work reliably.
+for bytes in "${VALUES_ARRAY[@]:0:20}"; do
+#for bytes in $VALUES; do
     OUTPUT=$(RUST_LOG=info cargo run -- client --transport-layer "webrtc" --server-address "/ip4/127.0.0.1/udp/8888/webrtc-direct/certhash/${CERT_HASH}/p2p/12D3KooWBpZHDZu7YSbvPaPXKhkRNJvR7MkTJMQQAVBKx9mCqz3q" --upload-bytes $bytes --download-bytes $bytes | grep bandwidth)
 
     result_line=$(echo "$OUTPUT" | cut -d ' ' -f5-13)
@@ -195,23 +195,9 @@ for bytes in "${VALUES_ARRAY[@]:0:10}"; do
     results_download_libp2p_litep2p_webrtc[$bytes]="$downloaded_bandwidth"
 done
 
-# Do upload from libp2p to litep2p up to 16MB because the connection breaks after that.
-for bytes in "${VALUES_ARRAY[@]:10:5}"; do
-    OUTPUT=$(RUST_LOG=info cargo run -- client --transport-layer "webrtc" --server-address "/ip4/127.0.0.1/udp/8888/webrtc-direct/certhash/${CERT_HASH}/p2p/12D3KooWBpZHDZu7YSbvPaPXKhkRNJvR7MkTJMQQAVBKx9mCqz3q" --upload-bytes $bytes --download-bytes 1024 | grep bandwidth)
-
-    result_line=$(echo "$OUTPUT" | cut -d ' ' -f5-13)
-    echo $result_line
-
-    uploaded_bandwidth=$(echo "$result_line" | cut -d' ' -f8-9 | head -n 1)
-    results_upload_libp2p_litep2p_webrtc[$bytes]="$uploaded_bandwidth"
-
-    results_download_libp2p_litep2p_webrtc[$bytes]="n/a"
-done
-
-for bytes in "${VALUES_ARRAY[@]:15}"; do
-    results_upload_libp2p_litep2p_webrtc[$bytes]="n/a"
-    results_download_libp2p_litep2p_webrtc[$bytes]="n/a"
-done
+oneGiB=${VALUES_ARRAY[20]}
+results_upload_libp2p_litep2p_webrtc[$oneGiB]="n/a"
+results_download_libp2p_litep2p_webrtc[$oneGiB]="n/a"
 
 # Kill the server
 kill $SERVER_PID
