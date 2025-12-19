@@ -2205,8 +2205,8 @@ checksum = "23fb14cb19457329c82206317a5663005a4d404783dc74f4252769b0d5f42856"
 
 [[package]]
 name = "litep2p"
-version = "0.12.2"
-source = "git+https://github.com/ChainSafe/litep2p?rev=78d0b6da78aaf9bae8af1f58d427bdd139f36521#78d0b6da78aaf9bae8af1f58d427bdd139f36521"
+version = "0.12.3"
+source = "git+https://github.com/paritytech/litep2p?branch=master#772840b1c53dc88a0b6f0808c73e7470442f2f95"
 dependencies = [
  "async-trait",
  "bs58",
