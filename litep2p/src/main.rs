@@ -27,9 +27,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let secret_key = litep2p::crypto::ed25519::SecretKey::try_from_bytes(&mut bytes)?;
             let mut litep2p_config = litep2p::config::ConfigBuilder::new()
                 .with_keypair(secret_key.into())
-                // After the keep alive timeout elapsed while no new substreams have been opened on
-                // the connection, litep2p downgrades it to inactive.
-                .with_keep_alive_timeout(Duration::from_mins(5))
                 .with_user_protocol(Box::new(perf));
 
             match server_opts.transport_layer {
