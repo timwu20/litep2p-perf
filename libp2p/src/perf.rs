@@ -63,6 +63,9 @@ pub async fn server_mode<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     // Step 4. Send the upload bytes.
     send_bytes(&mut substream, to_send).await?;
 
+    // Step 5. Close the substream gracefully.
+    substream.close().await?;
+
     Ok(())
 }
 
@@ -97,6 +100,9 @@ pub async fn client_mode<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
         elapsed.as_secs_f64(),
         utils::format_bandwidth(elapsed, download_bytes as usize)
     );
+
+    // Step 5. Close the substream gracefully.
+    substream.close().await?;
 
     Ok(())
 }

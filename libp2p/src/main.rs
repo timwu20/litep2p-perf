@@ -140,6 +140,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let addr: libp2p::Multiaddr = client_opts.server_address.parse()?;
             swarm.dial(addr)?;
 
+            let mut transfer_complete = false;
             loop {
                 let event = swarm.next().await;
                 tracing::info!("Event: {:?}", event);
@@ -152,6 +153,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         )?;
                     }
                     Some(SwarmEvent::Behaviour(..)) => {
+                        tracing::info!("Transfer complete, keeping connection alive to observe server-side closure...");
+                        transfer_complete = true;
+                        // Don't exit - keep connection alive to see if server closes properly
+                    }
+                    Some(SwarmEvent::ConnectionClosed { peer_id, cause, .. }) if transfer_complete => {
+                        tracing::info!("Connection closed by peer after transfer: peer_id={:?}, cause={:?}", peer_id, cause);
+                        tracing::info!("This indicates the server properly closed the connection");
                         return Ok(());
                     }
                     _ => {}
